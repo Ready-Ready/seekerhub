@@ -1,14 +1,12 @@
 import React from 'react';
 import { NavLink } from "react-router-dom"
-import { Card, Grid, CardContent, CardActions, Typography, Button } from '@material-ui/core';
-// import { makeStyles } from '@material-ui/styles';
-// import firebase from '../../firebase';
-
-
-
+import { Card, Grid, CardContent, CardActions, Typography, Button, Switch, FormControlLabel } from '@material-ui/core';
+import { useAuth } from "../../Auth"
 
 const ResourceCard = ({ resource }) => {
     
+    const { currentUser } = useAuth()
+
     return (
         <Grid  item xs={12} sm={6}>
             <Card >
@@ -27,8 +25,23 @@ const ResourceCard = ({ resource }) => {
                         {resource.referral.website}
                     </Typography>
                     <CardActions>
-                        <NavLink to={{pathname: `/programs/${resource.externalId}`}}>Learn More</NavLink>
-                    </CardActions>    
+                        <NavLink to={{pathname: `/programs/${resource.externalId}`}}>Learn More</NavLink>  
+
+                        {currentUser?
+                        <>
+                            <FormControlLabel
+                            control={<Switch name="checkedFavorite" />}
+                            label="Favorite" />
+                        </>
+                        :null
+                        }
+
+                        
+
+                    </CardActions>  
+
+                    
+
                 </CardContent>
             </Card>
         </Grid>
