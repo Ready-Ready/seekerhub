@@ -6,6 +6,8 @@ import { useAuth } from "../../Auth"
 const ResourceCard = ({ resource }) => {
     
     const { currentUser } = useAuth()
+   
+    if (currentUser) console.log('currentUser.mode is: ' + currentUser.mode);
 
     return (
         <Grid  item xs={12} sm={6}>
@@ -27,16 +29,14 @@ const ResourceCard = ({ resource }) => {
                     <CardActions>
                         <NavLink to={{pathname: `/programs/${resource.externalId}`}}>Learn More</NavLink>  
 
-                        {currentUser?
+                        {currentUser && currentUser.mode == 'all' ?
                         <>
                             <FormControlLabel
                             control={<Switch name="checkedFavorite" />}
-                            label="Favorite" />
+                            label="Favorite"  />
                         </>
                         :null
-                        }
-
-                        
+                        }                       
 
                     </CardActions>  
 

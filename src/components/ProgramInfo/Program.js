@@ -101,7 +101,6 @@ const Program = (props) => {
         const fetchProgram = async () => {
             const db = firebase.firestore()
             const programRef = db.collection("programs")
-            //`const snapshot =` await programRef.where('externalId', '==', parseInt(`${externalId}`) ).get()
             const recId = program_ID
             const snapshot = await programRef.where('externalId', '==', recId).get()
             setPrograms(snapshot.docs.map(doc => doc.data()))
