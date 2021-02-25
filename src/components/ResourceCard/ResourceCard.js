@@ -6,8 +6,15 @@ import { useAuth } from "../../Auth"
 const ResourceCard = ({ resource }) => {
     
     const { currentUser } = useAuth()
-   
-    if (currentUser) console.log('currentUser.mode is: ' + currentUser.mode);
+    var checked = false;
+
+    if (currentUser) 
+    {
+        if(currentUser.customData[0].favorite_programs.findIndex(a => a.programUID === resource.id)!==-1) 
+        {
+            checked = true; 
+        }   
+    }
 
     return (
         <Grid  item xs={12} sm={6}>
@@ -32,7 +39,7 @@ const ResourceCard = ({ resource }) => {
                         {currentUser && currentUser.mode == 'all' ?
                         <>
                             <FormControlLabel
-                            control={<Switch name="checkedFavorite" />}
+                            control={ <Switch checked={checked} />}
                             label="Favorite"  />
                         </>
                         :null
