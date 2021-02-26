@@ -2,6 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { NavLink } from "react-router-dom"
 import { makeStyles } from '@material-ui/styles'
 import {Grid, Card, CardContent, CardActions, Typography, Button } from '@material-ui/core';
+import Modal from '@material-ui/core/Modal';
+import Backdrop from '@material-ui/core/Backdrop';
+import Fade from '@material-ui/core/Fade';
 import firebase from '../../firebase';
 import Form from '@rjsf/material-ui';
 
@@ -11,6 +14,25 @@ const useStyles = makeStyles({
         paddingTop: "20px",
         paddingLeft: "50px",
         paddingRight: "50px",
+    },
+    modal: {
+        //display: 'flex',
+        position: 'absolute',
+        top: '20px',
+        left: '20px',
+        overflowY: 'scroll',
+        height: '80%',
+        width: '60%',
+        display: 'block',
+        alignItems: 'center',
+        justifyContent: 'center',
+        margin: '5%'        
+      },
+    paper: {
+        //backgroundColor: theme.palette.background.paper,
+        border: '2px solid #000',
+        //boxShadow: theme.shadows[5],
+        //padding: theme.spacing(2, 4, 3),
     }
 })
 
@@ -23,7 +45,6 @@ const Program = (props) => {
     const [activeForm, setActiveForm] = useState(null);
 
     const [open, setOpen] = useState(false);
-    const [openEdit, setOpenEdit] = useState(false);
     const [formJSON, setFormJSON] = useState();
     const [formEditData, setFormEditData] = useState();
 
@@ -31,7 +52,7 @@ const Program = (props) => {
         if (activeForm) console.log('program is: ' + program.name + ', activeForm is: ' + activeForm.status);
     
         return (
-            
+        <>
             <Grid item xs={12} >
                 <Card>
                     <CardContent>
@@ -100,7 +121,7 @@ const Program = (props) => {
 
                             {activeForm ?
                             <>
-                                <Button variant="outlined" onClick={(e) => handleOpen(e, JSON.stringify(activeForm.schema))}>
+                                <Button variant="outlined" onClick={(e) => handleOpen(e, activeForm.schema)}>
                                     Register
                                 </Button>  
                             </>
@@ -111,7 +132,41 @@ const Program = (props) => {
                         </CardActions>    
                     </CardContent>
                 </Card>
-            </Grid>        
+            </Grid> 
+
+            <Modal
+                aria-labelledby="transition-modal-title"
+                aria-describedby="transition-modal-description"
+                className={classes.modal}
+                open={open}
+                onClose={handleClose}
+                closeAfterTransition
+                BackdropComponent={Backdrop}
+                BackdropProps={{
+                timeout: 500,
+                }}
+                >
+                <Fade in={open}>
+                <Card>
+                    <CardActions>
+                        <Button variant="outlined" type="button" onClick={() => setOpen(false)}>
+                            Close
+                        </Button>
+                    </CardActions>
+                    <CardContent>          
+                        <Typography variant="h5" component="h2">
+                            Form Preview
+                        </Typography>          
+                        {formJSON?
+                            <Form schema={formJSON} onSubmit={handleFormSubmit} />
+                            :null
+                        }
+                    </CardContent>
+
+                </Card>
+                </Fade>
+            </Modal>            
+        </>
         )
     }
 
@@ -122,36 +177,19 @@ const Program = (props) => {
         setFormJSON(schema);
         setOpen(true);
     };
+
+    const handleFormSubmit = async (e) => {
+        console.log('submitted json');
+        console.dir(e.formData);
+
+        setActiveForm(null);
+        setOpen(false);
+    }    
+
+    const handleClose = () => {
+        setOpen(false);
+    };    
     
-    const handleOpenEdit = (e, form, formID) => {
-        e.preventDefault();
-    }
-
-    const displayForm = (form, handleOpen, handleOpenEdit) => {
-        console.log('in displayForm');
-
-        return (
-            <Grid item xs={12} >
-                <Card>
-                    <CardContent>
-                        <Typography variant="h5" component="h2">
-                            FORM TYPE: {form.type}
-                        </Typography>
-                        <br />
-                        <Typography variant="body2" component="p">
-                            FORM STATUS: {form.status}
-                        </Typography>
-                        <CardActions>
-                                <Button variant="outlined" onClick={(e) => handleOpen(e, JSON.stringify(form.schema))}>
-                                    Preview Form
-                                </Button>                                                                                                   
-                        </CardActions>    
-                    </CardContent>
-                </Card>
-            </Grid>
-        )
-    }
-
     useEffect(() => {
         const fetchProgram = async () => {
             const db = firebase.firestore()
