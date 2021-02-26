@@ -15,23 +15,17 @@ const FindResource = () => {
     const [checked, setChecked] = React.useState(false);
 
     const toggleChecked = () => {
-        if (checked!=true) currentUser.mode = 'favorite';
-        else currentUser.mode = 'all';
-
         setChecked((prev) => !prev);        
     };
 
     useEffect(() => {
-
-        if (currentUser.mode == 'favorite') setChecked(true); 
-        else setChecked(false); 
               
         const fetchResources = async () =>{
             setIsLoading(true)
             const db = firebase.firestore()
             const data = await db.collection("programs").orderBy("name").startAt(query).endAt(query + "\uf8ff").get()
 
-            if (currentUser!=null && currentUser.mode == 'favorite')
+            if (currentUser!=null && checked)
             {
                 const myData = data.docs.filter((doc, dIdx) => {
   

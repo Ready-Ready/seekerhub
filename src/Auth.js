@@ -34,19 +34,21 @@ export const AuthProvider = ({ children }) => {
         firebase.auth().onAuthStateChanged(async (user) =>{
             //look up service seekers custom fields
             const db = firebase.firestore();
-            const data = await db.collection("userSeekers").where("createdByUser", "==", user.uid).get();
-            user.customData = [];
-            user.mode = 'all';
- 
-            if (data.empty) {
-                console.log('No matching userSeekers documents.');
-                return;
+            if(user){
+                const data = await db.collection("userSeekers").where("createdByUser", "==", user.uid).get();
+                user.customData = [];
+                user.mode = 'all';
+     
+                if (data.empty) {
+                    console.log('No matching userSeekers documents.');
+                    return;
+                }
+                           
+                data.forEach(doc => {
+                    console.log(doc.id, '=>', doc.data());
+                    user.customData.push(doc.data());
+                });    
             }
-                       
-            data.forEach(doc => {
-                console.log(doc.id, '=>', doc.data());
-                user.customData.push(doc.data());
-            });
 
             setCurrentUser(user)
             setPending(false)

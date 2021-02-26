@@ -6,13 +6,13 @@ import { useAuth } from "../../Auth"
 const ResourceCard = ({ resource }) => {
     
     const { currentUser } = useAuth()
-    var checked = false;
+    var cardChecked = false;
 
     if (currentUser) 
     {
         if(currentUser.customData[0].favorite_programs.findIndex(a => a.programUID === resource.id)!==-1) 
         {
-            checked = true; 
+            cardChecked = true; 
         }   
     }
 
@@ -36,10 +36,10 @@ const ResourceCard = ({ resource }) => {
                     <CardActions>
                         <NavLink to={{pathname: `/programs/${resource.externalId}`}}>Learn More</NavLink>  
 
-                        {currentUser && currentUser.mode == 'all' ?
+                        {currentUser ?
                         <>
                             <FormControlLabel
-                            control={ <Switch checked={checked} />}
+                            control={ <Switch checked={cardChecked} />}
                             label="Favorite"  />
                         </>
                         :null
