@@ -14,94 +14,6 @@ const useStyles = makeStyles({
     }
 })
 
-
-
-const displayResource = (program, activeForm) => {
-    if (activeForm) console.log('program is: ' + program.name + ', activeForm is: ' + activeForm.status);
-
-    return (
-        
-        <Grid item xs={12} >
-            <Card>
-                <CardContent>
-                    <Typography variant="h5" component="h2">
-                        {program.name}
-                    </Typography>
-                    <Typography  color="textSecondary" gutterBottom>
-                        A program of {program.organizationName}
-                        <br />
-                    </Typography>
-                    <Typography variant='subtitle2'>
-                        Program Description:
-                    </Typography>
-                    
-                    <Typography variant="body2" component="p">
-                        {program.description}
-                    </Typography>
-                    <br />
-                    <Typography variant='subtitle2'>
-                        Program Eligibility:
-                    </Typography>
-                    <Typography variant="body2" component="p">
-                        {program.program_eligibility}
-                        
-                    </Typography>
-                    <br />
-                    <Typography variant='subtitle2'>
-                        Referral Process:
-                    </Typography>
-                    <Typography variant="body2" component="p">
-                        {program.referral.process}
-                    
-                    </Typography>
-                    <br />
-                    <Typography variant='subtitle2'>
-                        Referral Contact:
-                    </Typography>
-                    <Typography variant="body2" component="p">
-                        {program.referral.contact}
-                        
-                    </Typography>
-                    <br />
-                    <Typography variant='subtitle2'>
-                        Referral Email:
-                    </Typography>
-                    <Typography variant="body2" component="p">
-                        {program.referral.email}
-                        
-                    </Typography>
-                    <br />
-                    <Typography variant='subtitle2'>
-                        Referral Phone:
-                    </Typography>
-                    <Typography variant="body2" component="p">
-                        {program.referral.phone}
-                        
-                    </Typography>
-                    <br />
-
-                    <Typography  color="textSecondary">
-                        <br />
-                        {program.referral.website}
-                        <br />
-                    </Typography>
-                    <CardActions>
-
-                        {activeForm ?
-                        <>
-                            <NavLink to={{pathname: `/`}}>Register</NavLink>
-                        </>
-                        :null
-                        }                        
-                        
-                        <NavLink to={{pathname: `/`}}>Back</NavLink>
-                    </CardActions>    
-                </CardContent>
-            </Card>
-        </Grid>        
-    )
-}
-
 const Program = (props) => {
     const classes = useStyles();
     const { match } = props;
@@ -109,6 +21,136 @@ const Program = (props) => {
     const { program_ID } = params;
     const [programs, setPrograms] = useState([]);
     const [activeForm, setActiveForm] = useState(null);
+
+    const [open, setOpen] = useState(false);
+    const [openEdit, setOpenEdit] = useState(false);
+    const [formJSON, setFormJSON] = useState();
+    const [formEditData, setFormEditData] = useState();
+
+    const displayResource = (program, activeForm) => {
+        if (activeForm) console.log('program is: ' + program.name + ', activeForm is: ' + activeForm.status);
+    
+        return (
+            
+            <Grid item xs={12} >
+                <Card>
+                    <CardContent>
+                        <Typography variant="h5" component="h2">
+                            {program.name}
+                        </Typography>
+                        <Typography  color="textSecondary" gutterBottom>
+                            A program of {program.organizationName}
+                            <br />
+                        </Typography>
+                        <Typography variant='subtitle2'>
+                            Program Description:
+                        </Typography>
+                        
+                        <Typography variant="body2" component="p">
+                            {program.description}
+                        </Typography>
+                        <br />
+                        <Typography variant='subtitle2'>
+                            Program Eligibility:
+                        </Typography>
+                        <Typography variant="body2" component="p">
+                            {program.program_eligibility}
+                            
+                        </Typography>
+                        <br />
+                        <Typography variant='subtitle2'>
+                            Referral Process:
+                        </Typography>
+                        <Typography variant="body2" component="p">
+                            {program.referral.process}
+                        
+                        </Typography>
+                        <br />
+                        <Typography variant='subtitle2'>
+                            Referral Contact:
+                        </Typography>
+                        <Typography variant="body2" component="p">
+                            {program.referral.contact}
+                            
+                        </Typography>
+                        <br />
+                        <Typography variant='subtitle2'>
+                            Referral Email:
+                        </Typography>
+                        <Typography variant="body2" component="p">
+                            {program.referral.email}
+                            
+                        </Typography>
+                        <br />
+                        <Typography variant='subtitle2'>
+                            Referral Phone:
+                        </Typography>
+                        <Typography variant="body2" component="p">
+                            {program.referral.phone}
+                            
+                        </Typography>
+                        <br />
+    
+                        <Typography  color="textSecondary">
+                            <br />
+                            {program.referral.website}
+                            <br />
+                        </Typography>
+                        <CardActions>
+    
+                            {activeForm ?
+                            <>
+                                <Button variant="outlined" onClick={(e) => handleOpen(e, JSON.stringify(activeForm.schema))}>
+                                    Register
+                                </Button>  
+                            </>
+                            :null
+                            }                        
+                            
+                            <NavLink to={{pathname: `/`}}>Back</NavLink>
+                        </CardActions>    
+                    </CardContent>
+                </Card>
+            </Grid>        
+        )
+    }
+
+    const handleOpen = (e, schema) => {
+        console.log('in handleOpen, activeForm.schema is: ' + schema);
+
+        e.preventDefault();
+        setFormJSON(schema);
+        setOpen(true);
+    };
+    
+    const handleOpenEdit = (e, form, formID) => {
+        e.preventDefault();
+    }
+
+    const displayForm = (form, handleOpen, handleOpenEdit) => {
+        console.log('in displayForm');
+
+        return (
+            <Grid item xs={12} >
+                <Card>
+                    <CardContent>
+                        <Typography variant="h5" component="h2">
+                            FORM TYPE: {form.type}
+                        </Typography>
+                        <br />
+                        <Typography variant="body2" component="p">
+                            FORM STATUS: {form.status}
+                        </Typography>
+                        <CardActions>
+                                <Button variant="outlined" onClick={(e) => handleOpen(e, JSON.stringify(form.schema))}>
+                                    Preview Form
+                                </Button>                                                                                                   
+                        </CardActions>    
+                    </CardContent>
+                </Card>
+            </Grid>
+        )
+    }
 
     useEffect(() => {
         const fetchProgram = async () => {
@@ -147,6 +189,7 @@ const Program = (props) => {
 
         </>
     )
+
 }
 
 export default Program;
