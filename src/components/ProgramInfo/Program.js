@@ -97,7 +97,7 @@ const Program = (props) => {
                             <br />
                         </Typography>
                         <CardActions>
-    
+
                             {activeForm ?
                             <>
                                 <Button variant="outlined" onClick={(e) => handleOpen(e, JSON.stringify(activeForm.schema))}>
