@@ -3,6 +3,7 @@ import { NavLink } from "react-router-dom"
 import { makeStyles } from '@material-ui/styles'
 import {Grid, Card, CardContent, CardActions, Typography, Button } from '@material-ui/core';
 import firebase from '../../firebase';
+import Form from '@rjsf/material-ui';
 
 
 const useStyles = makeStyles({
@@ -14,9 +15,12 @@ const useStyles = makeStyles({
 })
 
 
-const displayResource = (program) => {
+
+const displayResource = (program, activeForm) => {
+    if (activeForm) console.log('program is: ' + program.name + ', activeForm is: ' + activeForm.status);
 
     return (
+        
         <Grid item xs={12} >
             <Card>
                 <CardContent>
@@ -48,7 +52,7 @@ const displayResource = (program) => {
                     </Typography>
                     <Typography variant="body2" component="p">
                         {program.referral.process}
-                       
+                    
                     </Typography>
                     <br />
                     <Typography variant='subtitle2'>
@@ -82,11 +86,19 @@ const displayResource = (program) => {
                         <br />
                     </Typography>
                     <CardActions>
+
+                        {activeForm ?
+                        <>
+                            <NavLink to={{pathname: `/`}}>Register</NavLink>
+                        </>
+                        :null
+                        }                        
+                        
                         <NavLink to={{pathname: `/`}}>Back</NavLink>
                     </CardActions>    
                 </CardContent>
             </Card>
-        </Grid>
+        </Grid>        
     )
 }
 
@@ -96,18 +108,28 @@ const Program = (props) => {
     const { params } = match;
     const { program_ID } = params;
     const [programs, setPrograms] = useState([]);
+    const [activeForm, setActiveForm] = useState(null);
 
     useEffect(() => {
         const fetchProgram = async () => {
             const db = firebase.firestore()
             const programRef = db.collection("programs")
-            const recId = program_ID
-            const snapshot = await programRef.where('externalId', '==', recId).get()
-            setPrograms(snapshot.docs.map(doc => doc.data()))
-            console.log('record id is: ' + program_ID)
+            const programSnapshot = await programRef.where('externalId', '==', program_ID).get()
+            setPrograms(programSnapshot.docs.map(doc => doc.data()))
+
+            const formSnapshot = await db.collection("programs").doc(programSnapshot.docs[0].id).collection("forms").where('status', '==', 'active').where('type', '==', 'registration').get();
+
+            console.log('This program has ' + formSnapshot.docs.length + ' active registration forms');
+            
+            const allForms = [];
+            formSnapshot.docs.forEach(doc => {
+                let currentID = doc.id;
+                let formObj = { ...doc.data(), 'id': currentID};
+                allForms.push(formObj);
+            });
+            setActiveForm(allForms[0]);
         }
         fetchProgram()
-
 
     }, [program_ID])
 
@@ -116,7 +138,7 @@ const Program = (props) => {
         <>
             <Grid container spacing={2} className={classes.resourceContainer}>
                     {programs.map((program) =>(
-                        displayResource(program)
+                        displayResource(program, activeForm)
                     )
                     )}
 
