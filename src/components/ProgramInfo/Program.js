@@ -7,7 +7,7 @@ import Backdrop from '@material-ui/core/Backdrop';
 import Fade from '@material-ui/core/Fade';
 import firebase from '../../firebase';
 import Form from '@rjsf/material-ui';
-
+import { useAuth } from "../../Auth"
 
 const useStyles = makeStyles({
     resourceContainer:{
@@ -37,12 +37,14 @@ const useStyles = makeStyles({
 })
 
 const Program = (props) => {
+    const { currentUser } = useAuth()
     const classes = useStyles();
     const { match } = props;
     const { params } = match;
     const { program_ID } = params;
     const [programs, setPrograms] = useState([]);
     const [activeForm, setActiveForm] = useState(null);
+    const [programUID, setProgramUID] = useState();
 
     const [open, setOpen] = useState(false);
     const [formJSON, setFormJSON] = useState();
@@ -181,7 +183,16 @@ const Program = (props) => {
     const handleFormSubmit = async (e) => {
         console.log('submitted json');
         console.dir(e.formData);
+    
+        const newJson = {
+            form_data: e.formData,
+            submittedByUser: currentUser.id,
+            submissionDateTime: Date().toLocaleString()
+         }
 
+        const db = firebase.firestore();                                  
+        await db.collection("programs").doc(programUID).collection("forms").doc(activeForm.id).collection("submissions").add(newJson);
+             
         setActiveForm(null);
         setOpen(false);
     }    
@@ -195,6 +206,7 @@ const Program = (props) => {
             const db = firebase.firestore()
             const programRef = db.collection("programs")
             const programSnapshot = await programRef.where('externalId', '==', program_ID).get()
+            setProgramUID(programSnapshot.docs[0].id)
             setPrograms(programSnapshot.docs.map(doc => doc.data()))
 
             const formSnapshot = await db.collection("programs").doc(programSnapshot.docs[0].id).collection("forms").where('status', '==', 'active').where('type', '==', 'registration').get();
@@ -210,7 +222,7 @@ const Program = (props) => {
             setActiveForm(allForms[0]);
         }
         fetchProgram()
-
+        
     }, [program_ID])
 
     return(
