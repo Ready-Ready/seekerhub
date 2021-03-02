@@ -1,21 +1,25 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { NavLink } from "react-router-dom"
-import { Card, Grid, CardContent, CardActions, Typography, Button, Switch, FormControlLabel } from '@material-ui/core';
+import { Card, Grid, CardContent, CardActions, Typography, Button, Switch, FormGroup, FormControlLabel } from '@material-ui/core';
 import { useAuth } from "../../Auth"
 
 const ResourceCard = ({ resource }) => {
-    
+  
     const { currentUser } = useAuth()
-    var cardChecked = false;
-
+    var favorite = false;
+    
     if (currentUser) 
     {
         if(currentUser.customData[0].favorite_programs.findIndex(a => a.programUID === resource.id)!==-1) 
-        {
-            cardChecked = true; 
-        }   
+            favorite = true;        
     }
 
+    const [cardChecked, setCardChecked] =  useState(favorite ? true : false)
+
+    const toggleCardChecked = () => {
+        setCardChecked((prev) => !prev);        
+    };
+   
     return (
         <Grid  item xs={12} sm={6}>
             <Card >
@@ -39,16 +43,13 @@ const ResourceCard = ({ resource }) => {
                         {currentUser ?
                         <>
                             <FormControlLabel
-                            control={ <Switch checked={cardChecked} />}
-                            label="Favorite"  />
+                            control={ <Switch checked={cardChecked} onChange={toggleCardChecked} color="primary" />}
+                            label="Favorite"  />                           
                         </>
                         :null
                         }                       
 
                     </CardActions>  
-
-                    
-
                 </CardContent>
             </Card>
         </Grid>

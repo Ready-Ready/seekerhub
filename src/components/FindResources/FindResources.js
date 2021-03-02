@@ -56,12 +56,12 @@ const FindResource = () => {
            
             {currentUser?
                 <Grid component="label" container spacing={0} alignItems="center" justify="center">
-                <Grid item>All Programs</Grid>
-                <Grid item>
-                    <Switch checked={checked} onChange={toggleChecked} />
+                    <Grid item>All Programs</Grid>
+                    <Grid item>
+                        <Switch checked={checked} onChange={toggleChecked} color="primary" />
+                    </Grid>
+                    <Grid item>My Favorite</Grid>
                 </Grid>
-                <Grid item>My Favorite</Grid>
-            </Grid>
 
             :null
             }
