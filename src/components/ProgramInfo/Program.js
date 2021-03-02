@@ -186,7 +186,7 @@ const Program = (props) => {
     
         const newJson = {
             form_data: e.formData,
-            submittedByUser: currentUser.id,
+            submittedByUser: String(currentUser.uid),
             submissionDateTime: Date().toLocaleString()
          }
 
