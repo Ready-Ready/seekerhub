@@ -37,17 +37,17 @@ const ResourceCard = ({ resource }) => {
 
     const deleteFavorite = async () => 
     {
-        console.log('in deleteFavorite');
+        const db = firebase.firestore();
+        const programSnapshot = await db.collection("programs").where('id', '==', resource.id).get()
+        var programDocId = programSnapshot.docs[0].id        
 
-        var arrayIndex = currentUser.customData[0].favorite_programs.findIndex(a => a.programUID === resource.id);
-        console.log('array index is: ' + arrayIndex);
-
-        const db = firebase.firestore(); 
+        let obj = { id: programDocId, name: resource.name, programUID: resource.id};
+         
         var userRef = db.collection("userSeekers").doc(currentUser.uid);
-  
         userRef.update({
-            favorite_programs: firebase.firestore.FieldValue.arrayRemove(String(arrayIndex))
-         });       
+            favorite_programs: firebase.firestore.FieldValue.arrayRemove(obj),  
+        })
+        .then((r) => console.log('Program removed from favorites.'));        
     }
 
     const toggleCardChecked = () => {
