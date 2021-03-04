@@ -35,14 +35,10 @@ const FindResource = () => {
                         return false;
                     }
                 });
-                console.log('checked is: ' + checked);
                 setResources(myData.map(doc => doc.data()));
             }
-            else {
-                console.log('checked is: ' + checked);
-                setResources(data.docs.map(doc => doc.data()))    
-            }
-                    
+            else setResources(data.docs.map(doc => doc.data()))    
+                          
             
             setIsLoading(false)
 

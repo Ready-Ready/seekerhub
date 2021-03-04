@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { NavLink } from "react-router-dom"
 import { Card, Grid, CardContent, CardActions, Typography, Button, Switch, FormGroup, FormControlLabel } from '@material-ui/core';
 import { useAuth } from "../../Auth"
+import firebase from '../../firebase';
 
 const ResourceCard = ({ resource }) => {
   
@@ -16,8 +17,54 @@ const ResourceCard = ({ resource }) => {
 
     const [cardChecked, setCardChecked] =  useState(favorite ? true : false)
 
+    const addFavorite = async () => 
+    {
+        const db = firebase.firestore();
+        const programSnapshot = await db.collection("programs").where('id', '==', resource.id).get()
+        var programDocId = programSnapshot.docs[0].id
+
+        const newJson = {
+            name: resource.name,
+            programUID: resource.id,
+            id: programDocId
+        }
+                   
+        var userRef = db.collection("userSeekers").doc(currentUser.uid);
+        userRef.update({
+            favorite_programs: firebase.firestore.FieldValue.arrayUnion(newJson)
+        });
+    }
+
+    const deleteFavorite = async () => 
+    {
+        console.log('in deleteFavorite');
+
+        var arrayIndex = currentUser.customData[0].favorite_programs.findIndex(a => a.programUID === resource.id);
+        console.log('array index is: ' + arrayIndex);
+
+        const db = firebase.firestore(); 
+        var userRef = db.collection("userSeekers").doc(currentUser.uid);
+  
+        userRef.update({
+            favorite_programs: firebase.firestore.FieldValue.arrayRemove(String(arrayIndex))
+         });       
+    }
+
     const toggleCardChecked = () => {
         setCardChecked((prev) => !prev);        
+
+        var newSelection = !cardChecked
+    
+        if(favorite && !newSelection)
+        {
+             deleteFavorite();
+            //favorite = false;  
+        }
+        else if(!favorite && newSelection) 
+        { 
+            addFavorite();
+            //favorite = true;  
+        }
     };
    
     return (
