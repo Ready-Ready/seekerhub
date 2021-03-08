@@ -57,7 +57,7 @@ export default function NavBar(){
           <>
             <span>Welcome {currentUser.email}</span>
             <NavLink to={{pathname: `/profile`}}>Profile</NavLink>
-            <Button variant="link" onClick={handleLogout}>Logout</Button>
+            <Button variant="outlined" onClick={handleLogout}>Logout</Button>
           </>
           :null
         }

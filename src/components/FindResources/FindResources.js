@@ -23,7 +23,7 @@ const FindResource = () => {
         const fetchResources = async () =>{
             setIsLoading(true)
             const db = firebase.firestore()
-            const data = await db.collection("programs").orderBy("name").startAt(query).endAt(query + "\uf8ff").get()
+            const data = await db.collection("programs").orderBy("name").startAt(query).endAt(query + "\uf8ff").get();
 
             if (currentUser!=null && checked)
             {
@@ -35,10 +35,22 @@ const FindResource = () => {
                         return false;
                     }
                 });
-                setResources(myData.map(doc => doc.data()));
+                const newResources = myData.map((doc)=> ({
+                    id: doc.id,
+                    ...doc.data()
+                }));
+                //setResources(myData.map(doc => doc.data()));
+                setResources(newResources);
             }
-            else setResources(data.docs.map(doc => doc.data()))    
-                          
+            else {
+                const newResources = data.docs.map((doc)=> ({
+                    id: doc.id,
+                    ...doc.data()
+                }));
+                //setResources(data.docs.map(doc => doc.data()))    
+                setResources(newResources);
+            }          
+            //resources.map(a => console.log(`title: ${a.name}, id: ${a.id}`));
             
             setIsLoading(false)
 
