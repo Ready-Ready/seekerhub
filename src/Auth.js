@@ -10,6 +10,7 @@ export function useAuth() {
 export const AuthProvider = ({ children }) => {
     const [currentUser, setCurrentUser ] = useState(null);
     const [pending, setPending ] = useState(true);
+    const [currentMessages, setCurrentMessages] = useState(null);
 
     function logout() {
         setCurrentUser();
@@ -32,9 +33,25 @@ export const AuthProvider = ({ children }) => {
     
     useEffect(() => {
         firebase.auth().onAuthStateChanged(async (user) =>{
-            //look up service seekers custom fields
+
             const db = firebase.firestore();
+            var deviceToken = '';
             if(user){
+                //get device token for messaging
+                const msg=firebase.messaging();
+                msg.getToken({vapidKey: "BNg_8F5MR9bcDyWKPd4IPbZM9m62yGv_aiw715HRXWE0QMg26iThniG_XjCCXGpr_jatV8sLk-yBPOaEMDrkgzk"})
+                .then((token)=>{
+                    console.warn("messaging token",token);
+                    deviceToken = token;
+                }).catch(err => {
+                    console.error("notifications blocked");
+                });
+                msg.onMessage((payload) => {
+                    console.log('Message received. ', payload);
+                    setCurrentMessages(payload);
+                });                
+
+                //look up service seekers custom fields
                 const data = await db.collection("userSeekers").where("createdByUser", "==", user.uid).get();
                 user.customData = [];
                 user.mode = 'all';
@@ -44,8 +61,17 @@ export const AuthProvider = ({ children }) => {
                     return;
                 }
                            
-                data.forEach(doc => {
-                    console.log(doc.id, '=>', doc.data());
+                data.forEach(async (doc) => {
+                    //check if a devices array has been added to this doc
+                    if(doc.data().devices){
+                        if(doc.data().devices.indexOf(deviceToken) === -1) {
+                            const aryDevices = doc.data().devices;
+                            aryDevices.push(deviceToken); 
+                            const updExistingDoc = await db.collection("userSeekers").doc(doc.id).update({devices: aryDevices});    
+                        }
+                    } else {
+                        const updDoc = await db.collection("userSeekers").doc(doc.id).update({devices: [deviceToken]});
+                    }
                     user.customData.push(doc.data());
                 });    
             }
@@ -63,7 +89,8 @@ export const AuthProvider = ({ children }) => {
         currentUser,
         logout,
         updateEmail,
-        updatePassword
+        updatePassword,
+        currentMessages
     }        
 
     return(

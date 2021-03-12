@@ -8,6 +8,8 @@ import Login from "../Auth/Login";
 import SignIn from "../../SignIn";
 import UpdateProfile from "../Auth/UpdateProfile";
 import PrivateRoute from "../Auth/PrivateRoute";
+import Message from "../Auth/Message";
+import Inbox from "../Inbox/Inbox";
 
 const StartPage = () => {
   //const { currentUser, logout } = useAuth();
@@ -15,6 +17,7 @@ const StartPage = () => {
     return(
       <>
             <NavBar />
+            <Message />
             <Switch>
                 <Route 
                   exact 
@@ -29,7 +32,8 @@ const StartPage = () => {
                 <Route path="/signup" component={Signup} />
                 <Route path="/login" component={Login} />
                 <Route path="/signin" component={SignIn} />
-                <PrivateRoute path="/profile" component={UpdateProfile} /> 
+                <PrivateRoute path="/profile" component={UpdateProfile} />
+                <PrivateRoute path="/inbox" component={Inbox} />
             </Switch>
 
       </>
