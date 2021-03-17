@@ -36,13 +36,14 @@ export default function Inbox(){
     
         const ref = firebase.firestore().collection("userSeekers").doc(seekerRef.docs[0].id).collection("messages").orderBy('createdAt', 'desc');
 
-        ref.onSnapshot(async (docs) => {
+        const unsubscribe = ref.onSnapshot(async (docs) => {
             const items = [];
             docs.forEach((doc) => {
                 if(doc.data().createdAt){
                     items.push({
                         body: doc.data().body,
-                        createdAt: new Date(doc.data().createdAt.seconds * 1000).toLocaleDateString("en-US")
+                        createdAt: new Date(doc.data().createdAt.seconds * 1000).toLocaleDateString("en-US"),
+                        id: doc.id
                     });
                 } else {
                     items.push({
@@ -54,8 +55,8 @@ export default function Inbox(){
             });
             setMessages(items);
             setLoading(false);
-        })
-
+        });
+        return () => unsubscribe;
     }
     
     useEffect(() => {
@@ -70,7 +71,7 @@ export default function Inbox(){
                     Inbox
                 </Typography>
                 <List dense={false}>
-                    {messages.map(message => <InboxItem createdAt={message.createdAt} body={message.body} />)}
+                    {messages.map(message => <InboxItem key={message.id} createdAt={message.createdAt} body={message.body} />)}
                 </List>
             </Grid>
         </div>

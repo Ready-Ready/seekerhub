@@ -89,11 +89,11 @@ export default function NavBar(){
           open={Boolean(anchorEl)}
           onClose={handleClose}
         >
-          <MenuItem onClick={() => handleMenuClick('home')}><HomeIcon /></MenuItem>
+          <MenuItem><HomeIcon onClick={() => handleMenuClick('home')}/></MenuItem>
           <MenuItem onClick={() => handleMenuClick('profile')}>Profile</MenuItem>
           <MenuItem onClick={() => handleMenuClick('inbox')}>Inbox</MenuItem>
           <MenuItem onClick={() => handleMenuClick('logout')}>Logout</MenuItem>
-          <MenuItem onClick={handleClose}><CloseIcon /></MenuItem>
+          <MenuItem ><CloseIcon onClick={handleClose}/></MenuItem>
         </Menu>        
         <Typography variant="h6" className={classes.title}>
           Resource Hub
