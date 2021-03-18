@@ -11,7 +11,7 @@ const ResourceCard = ({ resource }) => {
     
     if (currentUser) 
     {
-        if(currentUser.customData[0].favorite_programs.findIndex(a => a.programUID === resource.id)!==-1) 
+        if(currentUser?.customData[0]?.favorite_programs.findIndex(a => a.programUID === resource.id)!==-1) 
             favorite = true;        
     }
 
