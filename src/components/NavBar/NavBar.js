@@ -6,10 +6,15 @@ import { AppBar,
          Typography,
          Button,
          IconButton,
-         makeStyles
+         makeStyles,
+         Menu,
+         MenuItem,
+         Chip
          }
-         from '@material-ui/core'
-import MenuIcon from '@material-ui/icons/Menu'
+         from '@material-ui/core';
+import MenuIcon from '@material-ui/icons/Menu';
+import HomeIcon from '@material-ui/icons/Home';
+import CloseIcon from '@material-ui/icons/Cancel';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -42,22 +47,61 @@ export default function NavBar(){
     }
   }
 
+  const [anchorEl, setAnchorEl] = React.useState(null);
+
+  const handleMenuOpen = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleMenuClick = (action) => {
+    if(action === 'profile'){
+      handleClose();
+      history.push('/profile');
+    } else if (action === 'inbox') {
+      handleClose();
+      history.push('/inbox');
+    } else if (action === 'logout') {
+      handleClose();
+      handleLogout();
+    } else if (action === 'home') {
+      handleClose();
+      history.push('/');      
+    } else {
+      handleClose();
+    }
+  }
+
   return (
 
     <AppBar position="static">
       <Toolbar>
         <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="menu">
-          <MenuIcon />
+          <MenuIcon onClick={handleMenuOpen} />
         </IconButton>
+        <Menu
+          id="simple-menu"
+          anchorEl={anchorEl}
+          keepMounted
+          open={Boolean(anchorEl)}
+          onClose={handleClose}
+        >
+          <MenuItem><HomeIcon onClick={() => handleMenuClick('home')}/></MenuItem>
+          <MenuItem onClick={() => handleMenuClick('profile')}>Profile</MenuItem>
+          <MenuItem onClick={() => handleMenuClick('inbox')}>Inbox</MenuItem>
+          <MenuItem onClick={() => handleMenuClick('logout')}>Logout</MenuItem>
+          <MenuItem ><CloseIcon onClick={handleClose}/></MenuItem>
+        </Menu>        
         <Typography variant="h6" className={classes.title}>
           Resource Hub
         </Typography>
 
         {currentUser?
           <>
-            <span>Welcome {currentUser.email}</span>
-            <NavLink to={{pathname: `/profile`}}>Profile</NavLink>
-            <Button variant="link" onClick={handleLogout}>Logout</Button>
+            <Chip label={currentUser.email} variant="outlined" size="small" />
           </>
           :null
         }

@@ -7,9 +7,42 @@ export function useAuth() {
     return useContext(AuthContext)
 }
 
+const getUserSeeker = (db, user) => {
+
+    return new Promise(async (resolve, reject) => {
+        try {
+            var data = await db.collection("userSeekers").where("createdByUser", "==", user.uid).get();
+
+            if (data.empty) {
+
+                setTimeout(async () => {
+                        data = await db.collection("userSeekers").where("createdByUser", "==", user.uid).get();
+                        if (data.empty) {
+                            reject('unable to get userSeeker data after 2 tries');    
+                        } else {
+                            resolve(data);
+                        }        
+                    },
+                    
+                    5000
+                );
+
+
+            } else {
+                resolve(data);
+            }
+            
+        } catch(err) {
+            reject('error getting userSeeker data');
+        }
+
+    })
+}
+
 export const AuthProvider = ({ children }) => {
     const [currentUser, setCurrentUser ] = useState(null);
     const [pending, setPending ] = useState(true);
+    const [currentMessages, setCurrentMessages] = useState(null);
 
     function logout() {
         setCurrentUser();
@@ -32,22 +65,60 @@ export const AuthProvider = ({ children }) => {
     
     useEffect(() => {
         firebase.auth().onAuthStateChanged(async (user) =>{
-            //look up service seekers custom fields
+
             const db = firebase.firestore();
+            var deviceToken = '';
             if(user){
-                const data = await db.collection("userSeekers").where("createdByUser", "==", user.uid).get();
-                user.customData = [];
-                user.mode = 'all';
-     
-                if (data.empty) {
-                    console.log('No matching userSeekers documents.');
-                    return;
+                //get device token for messaging
+                const msg=firebase.messaging();
+                var token = null;
+                try {
+                    token = await msg.getToken({vapidKey: "BNg_8F5MR9bcDyWKPd4IPbZM9m62yGv_aiw715HRXWE0QMg26iThniG_XjCCXGpr_jatV8sLk-yBPOaEMDrkgzk"})
+                } catch(err) {
+                    console.error("notifications blocked");
+                    console.log(err);
                 }
-                           
-                data.forEach(doc => {
-                    console.log(doc.id, '=>', doc.data());
-                    user.customData.push(doc.data());
-                });    
+                
+                console.log("1. messaging token",token);
+                deviceToken = token;
+
+                msg.onMessage((payload) => {
+                    console.log('Message received. ', payload);
+                    setCurrentMessages(payload);
+                });                
+
+                //look up service seekers custom fields
+                //const data = await db.collection("userSeekers").where("createdByUser", "==", user.uid).get();
+                try {
+                    console.log('2.  sending query to getUserSeeker');
+                    const data = await getUserSeeker(db, user);
+                    console.log(`3.  received query to getUserSeeker with result count: ${data.size}`);
+                    user.customData = [];
+                    user.mode = 'all';
+         
+                    if (data.empty) {
+                        console.log('No matching userSeekers documents.');
+                        return;
+                    }
+                               
+                    data.forEach(async (doc) => {
+                        //check if a devices array has been added to this doc
+                        if(doc.data().devices){
+                            if(doc.data().devices.indexOf(deviceToken) === -1) {
+                                const aryDevices = doc.data().devices;
+                                aryDevices.push(deviceToken); 
+                                const updExistingDoc = await db.collection("userSeekers").doc(doc.id).update({devices: aryDevices});    
+                            }
+                        } else {
+                            const updDoc = await db.collection("userSeekers").doc(doc.id).update({devices: [deviceToken]});
+                        }
+                        user.customData.push(doc.data());
+                    });  
+                } catch (err) {
+                    console.log('Error with getUserSeeker promise');
+                    console.log(err);
+                }
+  
             }
 
             setCurrentUser(user)
@@ -63,7 +134,8 @@ export const AuthProvider = ({ children }) => {
         currentUser,
         logout,
         updateEmail,
-        updatePassword
+        updatePassword,
+        currentMessages
     }        
 
     return(
