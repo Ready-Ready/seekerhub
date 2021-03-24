@@ -10,6 +10,7 @@ import UpdateProfile from "../Auth/UpdateProfile";
 import PrivateRoute from "../Auth/PrivateRoute";
 import Message from "../Auth/Message";
 import Inbox from "../Inbox/Inbox";
+import InboxCard from "../Inbox/InboxCard";
 
 const StartPage = () => {
   //const { currentUser, logout } = useAuth();
@@ -28,6 +29,11 @@ const StartPage = () => {
                   exact
                   path="/programs/:program_ID"
                   render={(props) => <Program {...props} />}
+                />
+                 <Route 
+                  exact
+                  path="/messages/:message_ID"
+                  render={(props) => <InboxCard {...props} />}
                 />
                 <Route path="/signup" component={Signup} />
                 <Route path="/login" component={Login} />

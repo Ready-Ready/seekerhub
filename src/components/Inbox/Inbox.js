@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import Grid from '@material-ui/core/Grid';
+import { Card, Grid, CardContent } from '@material-ui/core';
 import Typography from '@material-ui/core/Typography';
 import List from '@material-ui/core/List';
 import firebase from '../../firebase';
@@ -43,13 +43,19 @@ export default function Inbox(){
                     items.push({
                         body: doc.data().body,
                         createdAt: new Date(doc.data().createdAt.seconds * 1000).toLocaleDateString("en-US"),
-                        id: doc.id
+                        id: doc.id,
+                        toProgram: doc.data().toProgram,         
+                        status: doc.data().status              
                     });
+
                 } else {
                     items.push({
                         body: doc.data().body,
-                        createdAt: null
-                    });                    
+                        createdAt: null,
+                        id: doc.id,
+                        toProgram: doc.data().toProgram,
+                        status: doc.data().status
+                    }); 
                 }
 
             });
@@ -61,19 +67,24 @@ export default function Inbox(){
     
     useEffect(() => {
         getMessages();
-    }, []);
+    });
 
     return (
-        <div className={classes.root}>
-            {loading ? <h1>Loading...</h1> : null}
-            <Grid item xs={12} md={6}>
-                <Typography variant="h6" className={classes.title}>
-                    Inbox
-                </Typography>
-                <List dense={false}>
-                    {messages.map(message => <InboxItem key={message.id} createdAt={message.createdAt} body={message.body} />)}
-                </List>
+        <Grid container spacing={0}>
+            <Grid item xs={8} md={4}>
+                <Card >
+                    <CardContent>
+                        <Typography variant="h6" className={classes.title}>
+                            Inbox
+                        </Typography>
+                        <div className={classes.demo}>
+                        <List dense={false}>
+                                    {messages.map(message => <InboxItem key={message.id} id={message.id} toProgram={message.toProgram} status={message.status} createdAt={message.createdAt} body={message.body} userId = {currentUser.uid}/>)}
+                                </List>
+                        </div>
+                    </CardContent>
+                </Card>              
             </Grid>
-        </div>
-    )
+        </Grid>
+     )
 }
