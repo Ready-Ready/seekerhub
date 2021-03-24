@@ -1,14 +1,25 @@
 import React from 'react';
-import { ListItem, IconButton, ListItemText, ListItemAvatar, ListItemSecondaryAction, Typography, Tooltip } from '@material-ui/core';
+import { ListItem, IconButton, ListItemText, ListItemAvatar, ListItemSecondaryAction, Typography, Tooltip, Grid, CircularProgress } from '@material-ui/core';
 import Avatar from '@material-ui/core/Avatar';
 import FolderIcon from '@material-ui/icons/Folder';
 import FolderOpenIcon from '@material-ui/icons/FolderOpen';
 import ArchiveIcon from '@material-ui/icons/Archive';
 import { useHistory } from "react-router-dom";
 import firebase from '../../firebase';
+import { makeStyles } from '@material-ui/styles';
+
+const useStyles = makeStyles({
+  resourceContainer:{
+      paddingTop: "20px",
+      paddingLeft: "50px",
+      paddingRight: "50px",
+  }
+})
 
 export default function InboxItem(props){
-
+  
+  const classes = useStyles();
+  
   const db = firebase.firestore();
 
   const history = useHistory();
@@ -26,7 +37,14 @@ export default function InboxItem(props){
  
 
     return (
-       <ListItem button divider="true" onClick={() => openMessage()}>         
+      <Grid container justify="center">
+        { false ? ( //props.isLoading ? (
+            <Grid item className={classes.resourceContainer}>
+            <CircularProgress />
+            </Grid>
+            ) : 
+       ( 
+       <ListItem button divider="true" onClick={() => openMessage()}> 
           <ListItemAvatar>
           {props.status === "unread" ?
               <>
@@ -73,8 +91,13 @@ export default function InboxItem(props){
               </IconButton>
             </Tooltip>
           </ListItemSecondaryAction>
-      </ListItem> 
+               
+      </ListItem>
+       )}
+
+     </Grid>
     )
+    
 }
 
 

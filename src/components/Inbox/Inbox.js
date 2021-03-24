@@ -79,8 +79,8 @@ export default function Inbox(){
                         </Typography>
                         <div className={classes.demo}>
                         <List dense={false}>
-                                    {messages.map(message => <InboxItem key={message.id} id={message.id} toProgram={message.toProgram} status={message.status} createdAt={message.createdAt} body={message.body} userId = {currentUser.uid}/>)}
-                                </List>
+                                    {messages.map(message => <InboxItem isLoading={loading} key={message.id} id={message.id} toProgram={message.toProgram} status={message.status} createdAt={message.createdAt} body={message.body} userId = {currentUser.uid}/>)}
+                        </List>
                         </div>
                     </CardContent>
                 </Card>              
