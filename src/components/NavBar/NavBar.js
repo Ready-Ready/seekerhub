@@ -91,7 +91,7 @@ export default function NavBar(){
         >
           <MenuItem><HomeIcon onClick={() => handleMenuClick('home')}/></MenuItem>
           <MenuItem onClick={() => handleMenuClick('profile')}>Profile</MenuItem>
-          <MenuItem onClick={() => handleMenuClick('inbox')}>Inbox</MenuItem>
+          <MenuItem onClick={() => handleMenuClick('inbox')}>My Referrals</MenuItem>
           <MenuItem onClick={() => handleMenuClick('logout')}>Logout</MenuItem>
           <MenuItem ><CloseIcon onClick={handleClose}/></MenuItem>
         </Menu>        

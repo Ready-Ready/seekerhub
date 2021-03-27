@@ -80,10 +80,15 @@ const ResourceCard = ({ resource }) => {
                     <Typography variant="body2" component="p">
                         {resource.description}
                     </Typography>
-                    <Typography  color="textSecondary">
-                        <br />
-                        {resource.referral.website}
-                    </Typography>
+                    {resource.referral ?
+                    <>
+                        <Typography  color="textSecondary">
+                            <br />
+                            {resource.referral.website}
+                        </Typography>
+                    </>
+                    :null
+                    }                    
                     <CardActions>
                         <NavLink to={{pathname: `/programs/${resource.externalId}`}}>Learn More</NavLink>  
 

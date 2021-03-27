@@ -3,8 +3,23 @@ import { NavLink } from "react-router-dom";
 import firebase from '../../firebase';
 import { useAuth } from '../../Auth';
 import { useState, useEffect } from 'react';
+import { makeStyles } from '@material-ui/core/styles';
+
+const useStyles = makeStyles((theme) => ({
+    root: {
+      flexGrow: 1,
+      maxWidth: 752,
+    },
+    demo: {
+      backgroundColor: theme.palette.background.paper,
+    },
+    title: {
+      margin: theme.spacing(4, 0, 2),
+    },
+}));
 
 const InboxCard= (props) => {
+    const classes = useStyles();
 
     const { match } = props;
     const { params } = match;
@@ -18,9 +33,12 @@ const InboxCard= (props) => {
   
         return (
             <>
-            <Grid  item xs={12} sm={6}>
+             <Grid item xs={10} md={5}>
             <Card >
                 <CardContent>
+                    <Typography variant="h6" className={classes.title}>
+                        Message Detail
+                    </Typography>
                     <Typography  color="textSecondary" gutterBottom>
                         Message Date: {message.createdAt}
                     </Typography>

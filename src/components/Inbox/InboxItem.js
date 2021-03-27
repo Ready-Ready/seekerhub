@@ -11,7 +11,7 @@ import { makeStyles } from '@material-ui/styles';
 const useStyles = makeStyles({
   resourceContainer:{
       paddingTop: "20px",
-      paddingLeft: "50px",
+      paddingLeft: "20px",
       paddingRight: "50px",
   }
 })
@@ -34,28 +34,33 @@ export default function InboxItem(props){
       history.push('/messages/'+props.id);
   }
 
+  const archiveMessage = () => {
+    //set message status to archived 
+    var messageRef = db.collection("userSeekers").doc(props.userId).collection("messages").doc(props.id);  
+    messageRef.update({status: "archived"});   
+}
  
 
     return (
-      <Grid container justify="center">
+      <Grid container >
         { false ? ( //props.isLoading ? (
             <Grid item className={classes.resourceContainer}>
             <CircularProgress />
             </Grid>
             ) : 
        ( 
-       <ListItem button divider="true" onClick={() => openMessage()}> 
+       <ListItem button divider="true" alignItems="flex-start" className={classes.resourceContainer}>
           <ListItemAvatar>
           {props.status === "unread" ?
               <>
                 <Avatar>
-                  <FolderIcon />  
+                  <FolderIcon></FolderIcon>  
                 </Avatar>
               </>
               :
               <>
                 <Avatar>
-                  <FolderOpenIcon />  
+                  <FolderOpenIcon></FolderOpenIcon>   
                 </Avatar>
               </>
           }
@@ -63,7 +68,7 @@ export default function InboxItem(props){
 
           {props.status === "unread" ?
               <>
-                  <ListItemText         
+                  <ListItemText onClick={() => openMessage()} 
                     primary={
                       <Typography style={{ fontStyle: "bold" }}>
                         {props.createdAt}
@@ -77,21 +82,24 @@ export default function InboxItem(props){
               </>
               :
               <>
-                  <ListItemText         
+                  <ListItemText onClick={() => openMessage()}
                     primary={props.createdAt}
                     secondary={props.body}
                   />                             
               </>
               }   
                       
+         {props.status !== "archived" ?
+         <>            
           <ListItemSecondaryAction>
             <Tooltip title="Archive">
               <IconButton edge="end" aria-label="archive">
-                <ArchiveIcon />
+                <ArchiveIcon onClick={() => archiveMessage()}> </ArchiveIcon>
               </IconButton>
             </Tooltip>
           </ListItemSecondaryAction>
-               
+          </>  : null  
+        } 
       </ListItem>
        )}
 
