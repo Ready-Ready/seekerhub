@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { NavLink } from "react-router-dom"
-import { Card, Grid, CardContent, CardActions, Typography, Button, Switch, FormGroup, FormControlLabel } from '@material-ui/core';
+import { Card, Grid, CardContent, CardActions, Typography, Switch, FormControlLabel } from '@material-ui/core';
 import { useAuth } from "../../Auth"
 import firebase from '../../firebase';
 
@@ -9,12 +9,8 @@ const ResourceCard = ({ resource }) => {
     const { currentUser } = useAuth()
     var favorite = false;
     
-    if (currentUser) 
-    {
-        if(currentUser?.customData[0]?.favorite_programs.findIndex(a => a.programUID === resource.id)!==-1) 
-            favorite = true;        
-    }
-
+    if (currentUser) favorite = resource.favorite;
+    
     const [cardChecked, setCardChecked] =  useState(favorite ? true : false)
 
     const addFavorite = async () => 
@@ -23,16 +19,11 @@ const ResourceCard = ({ resource }) => {
         const programSnapshot = await db.collection("programs").where('id', '==', resource.id).get()
         var programDocId = programSnapshot.docs[0].id
 
-        const newJson = {
+        db.collection("userSeekers").doc(currentUser.uid).collection("favorite_programs").doc(programDocId).set({
             name: resource.name,
             programUID: resource.id,
             id: programDocId
-        }
-                   
-        var userRef = db.collection("userSeekers").doc(currentUser.uid);
-        userRef.update({
-            favorite_programs: firebase.firestore.FieldValue.arrayUnion(newJson)
-        });
+        })
     }
 
     const deleteFavorite = async () => 
@@ -40,14 +31,10 @@ const ResourceCard = ({ resource }) => {
         const db = firebase.firestore();
         const programSnapshot = await db.collection("programs").where('id', '==', resource.id).get()
         var programDocId = programSnapshot.docs[0].id        
+    
+        var docRef = db.collection("userSeekers").doc(currentUser.uid).collection("favorite_programs");
 
-        let obj = { id: programDocId, name: resource.name, programUID: resource.id};
-         
-        var userRef = db.collection("userSeekers").doc(currentUser.uid);
-        userRef.update({
-            favorite_programs: firebase.firestore.FieldValue.arrayRemove(obj),  
-        })
-        .then((r) => console.log('Program removed from favorites.'));        
+        docRef.doc(programDocId).delete();
     }
 
     const toggleCardChecked = () => {
@@ -64,7 +51,7 @@ const ResourceCard = ({ resource }) => {
         { 
             addFavorite();
             //favorite = true;  
-        }
+        }       
     };
    
     return (

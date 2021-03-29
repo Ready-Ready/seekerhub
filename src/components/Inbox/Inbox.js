@@ -77,8 +77,7 @@ export default function Inbox(){
         setLoading(true);
         const seekerRef = await firebase.firestore().collection("userSeekers").where('createdByUser', '==', currentUser.uid).get();
     
-        const msgRef = firebase.firestore().collection("userSeekers").doc(seekerRef.docs[0].id).collection("messages"); //.where('status', '!=', 'archived').orderBy('status', 'desc').orderBy('createdAt', 'desc');
-    
+        const msgRef = firebase.firestore().collection("userSeekers").doc(seekerRef.docs[0].id).collection("messages");     
         const unsubscribe = msgRef.onSnapshot(async (docs) => {
             const items = [];
             const aItems = [];
