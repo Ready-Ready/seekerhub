@@ -15,7 +15,7 @@ const FindResource = () => {
     const [checked, setChecked] = React.useState(false);
 
     const toggleChecked = () => {
-        setChecked((prev) => !prev);        
+        setChecked((prev) => !prev);       
     };
 
     useEffect(() => {
@@ -25,11 +25,17 @@ const FindResource = () => {
             const db = firebase.firestore()
             const data = await db.collection("programs").orderBy("name").startAt(query).endAt(query + "\uf8ff").get();
 
+            const seekerRef = await firebase.firestore().collection("userSeekers").where('createdByUser', '==', currentUser.uid).get();
+            const favoritesRef = await firebase.firestore().collection("userSeekers").doc(seekerRef.docs[0].id).collection("favorite_programs").get();
+
             if (currentUser!=null && checked)
             {
-                const myData = data.docs.filter((doc, dIdx) => {
+                var fav = false;
+
+                const myData = data.docs.filter((doc, dIdx) => {              
   
-                    if(currentUser.customData[0].favorite_programs.findIndex(a => a.id === doc.id)!==-1) {
+                    if(favoritesRef.docs.findIndex(a => a.id === doc.id)!==-1) {
+                        fav = true;
                         return true;
                     } else {
                         return false;
@@ -37,17 +43,17 @@ const FindResource = () => {
                 });
                 const newResources = myData.map((doc)=> ({
                     id: doc.id,
+                    favorite: fav,
                     ...doc.data()
                 }));
-                //setResources(myData.map(doc => doc.data()));
                 setResources(newResources);
             }
             else {
                 const newResources = data.docs.map((doc)=> ({
                     id: doc.id,
+                    favorite:  (favoritesRef.docs.findIndex(a => a.id === doc.id)!==-1) ? true : false,
                     ...doc.data()
                 }));
-                //setResources(data.docs.map(doc => doc.data()))    
                 setResources(newResources);
             }          
             //resources.map(a => console.log(`title: ${a.name}, id: ${a.id}`));
